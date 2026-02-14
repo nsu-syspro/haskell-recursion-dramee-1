@@ -81,7 +81,7 @@ reverse [] = []
 
 doubleEveryOther :: [Int] -> [Int]
 doubleEveryOther (x : y : xs) = x * 2 : y : doubleEveryOther xs
-doubleEveryOther [x] = [x]
+doubleEveryOther [x] = [x * 2]
 doubleEveryOther [] = []
 
 -----------------------------------
@@ -100,7 +100,7 @@ doubleEveryOther [] = []
 
 normalize :: Int -> Int
 normalize a
-    | a >= 10   = a -9
+    | a >= 10   = a - 9
     | otherwise = a
 
 -----------------------------------
