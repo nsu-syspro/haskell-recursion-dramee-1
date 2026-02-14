@@ -78,7 +78,7 @@ luhnHex = luhnModN 16 digitToInt
 digitToInt :: Char -> Int
 digitToInt c
     | isDigit c = ord c - ord '0'
-    | isHex c   = ord (toLower c) - ord 'a' + 10
+    | isHex (toLower c)  = ord (toLower c) - ord 'a' + 10
     | otherwise = error "Invalid character"
 
 isDigit :: Char -> Bool
