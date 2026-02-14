@@ -22,7 +22,7 @@ import Prelude hiding (filter, foldl, foldr, head, init, last, length, map, read
 -- False
 
 validate :: Integer -> Bool
-validate = error "TODO: define validate"
+validate a = luhn (toDigits (a `div` 10)) == fromIntegral (a `mod` 10)
 
 -----------------------------------
 --
@@ -34,7 +34,8 @@ validate = error "TODO: define validate"
 -- 1
 
 luhn :: [Int] -> Int
-luhn = error "TODO: define luhn"
+luhn xs = (10 - s `mod` 10) `mod` 10
+    where s = sum (map normalize (doubleEveryOther (reverse xs)))
 
 -----------------------------------
 --
@@ -51,21 +52,23 @@ luhn = error "TODO: define luhn"
 -- []
 
 toDigits :: Integer -> [Int]
-toDigits = error "TODO: define toDigits"
-
+toDigits n
+    |n > 0     = toDigits (n `div` 10) ++ [fromIntegral (n `mod` 10)]
+    |otherwise = []
 -----------------------------------
---
+
 -- Produces list in reverse order to the given one
 --
 -- Usage example:
 --
 -- >>> reverse "Hello"
--- "olleH"
+-- TODO: define reverse
 -- >>> reverse [3,4,5,6]
--- [6,5,4,3]
+-- <stderr>: hPutChar: invalid argument (cannot encode character '\8226')
 
 reverse :: [a] -> [a]
-reverse = error "TODO: define reverse"
+reverse (x:xs) = reverse xs ++ [x]
+reverse [] = []
 
 -----------------------------------
 --
@@ -77,7 +80,9 @@ reverse = error "TODO: define reverse"
 -- [12,5,8,3]
 
 doubleEveryOther :: [Int] -> [Int]
-doubleEveryOther = error "TODO: define doubleEveryOther"
+doubleEveryOther (x : y : xs) = x * 2 : y : doubleEveryOther xs
+doubleEveryOther [x] = [x]
+doubleEveryOther [] = []
 
 -----------------------------------
 --
@@ -94,7 +99,9 @@ doubleEveryOther = error "TODO: define doubleEveryOther"
 -- 1
 
 normalize :: Int -> Int
-normalize = error "TODO: define normalize"
+normalize a
+    | a >= 10   = a -9
+    | otherwise = a
 
 -----------------------------------
 --
@@ -107,7 +114,9 @@ normalize = error "TODO: define normalize"
 -- [2,4,6,8]
 
 map :: (a -> b) -> [a] -> [b]
-map = error "TODO: define map"
+map f (x:xs) = f x : map f xs
+map _ [] = []
+
 
 -----------------------------------
 --
@@ -121,4 +130,5 @@ map = error "TODO: define map"
 -- 0
 
 sum :: [Int] -> Int
-sum = error "TODO: define sum"
+sum (x:xs) = x + sum xs
+sum [] = 0
