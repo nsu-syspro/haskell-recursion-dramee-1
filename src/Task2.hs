@@ -16,6 +16,7 @@ import Prelude hiding (filter, foldl, foldr, head, init, last, length, map, read
 import Task1 (map, reverse, sum, doubleEveryOther, normalize, toDigits)
 import Data.Char (ord, toLower)
 import Data.Bits (Bits(xor))
+import Data.Foldable (Foldable(length))
 
 -----------------------------------
 --
@@ -72,18 +73,22 @@ luhnHex = luhnModN 16 digitToInt
 -- >>> map digitToInt ['a'..'f']
 -- [10,11,12,13,14,15]
 -- >>> map digitToInt ['A'..'F']
--- [-22,-21,-20,-19,-18,-17]
+-- [10,11,12,13,14,15]
 
 digitToInt :: Char -> Int
 digitToInt c
-    | isDigit c                            = ord c - ord '0'
-    | toLower c >= 'a' && toLower c <= 'f' = ord (toLower c) - ord 'a' + 10
-    | otherwise                            = error "Invalid character"
+    | isDigit c = ord c - ord '0'
+    | isHex c   = ord (toLower c) - ord 'a' + 10
+    | otherwise = error "Invalid character"
 
 isDigit :: Char -> Bool
 isDigit c | c >= '0' && c <= '9' = True
           | otherwise            = False
 
+isHex :: Char -> Bool
+isHex c 
+    | c >= 'a' && c <= 'f' = True
+    | otherwise            = False
 -----------------------------------
 --
 -- Checks whether the last decimal digit is a valid check digit
@@ -99,7 +104,7 @@ isDigit c | c >= '0' && c <= '9' = True
 -- False
 
 validateDec :: Integer -> Bool
-validateDec a = luhnDec (toDigits a) == (fromIntegral a `mod` 10)
+validateDec a = luhnDec (toDigits (a `div` 10)) == (fromIntegral a `mod` 10)
 
 -----------------------------------
 --
@@ -117,7 +122,7 @@ validateDec a = luhnDec (toDigits a) == (fromIntegral a `mod` 10)
 
 
 validateHex :: [Char] -> Bool
-validateHex xs = luhnHex xs == digitToInt (last xs)
+validateHex xs = luhnHex (take (length xs - 1) xs)  == digitToInt (last xs)
 
 head :: [a] -> a
 head (x:_) = x
