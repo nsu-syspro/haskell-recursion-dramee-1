@@ -9,10 +9,13 @@ module Task2 where
 -- that are not supposed to be used in this assignment
 import Prelude hiding (filter, foldl, foldr, head, init, last, length, map, read, reverse, show, sum, tail)
 
+
 -- You can reuse already implemented functions from Task1
 -- by listing them in this import clause
 -- NOTE: only listed functions are imported, everything else remains hidden
-import Task1 (map, reverse, sum)
+import Task1 (map, reverse, sum, doubleEveryOther, normalize, toDigits)
+import Data.Char (ord, toLower)
+import Data.Bits (Bits(xor))
 
 -----------------------------------
 --
@@ -25,7 +28,14 @@ import Task1 (map, reverse, sum)
 -- 1
 
 luhnModN :: Int -> (a -> Int) -> [a] -> Int
-luhnModN = error "TODO: define luhnModN"
+luhnModN n f xs = (n - s `mod` n) `mod` n
+    where s = sum (map (normalizeN n) (doubleEveryOther (reverse (map f xs))))
+
+
+normalizeN :: Int -> Int -> Int
+normalizeN n x
+    | x >= n    = x - (n - 1)
+    | otherwise = x
 
 -----------------------------------
 --
@@ -37,7 +47,7 @@ luhnModN = error "TODO: define luhnModN"
 -- 1
 
 luhnDec :: [Int] -> Int
-luhnDec = error "TODO: define luhnDec"
+luhnDec = luhnModN 10 id
 
 -----------------------------------
 --
@@ -49,7 +59,7 @@ luhnDec = error "TODO: define luhnDec"
 -- 15
 
 luhnHex :: [Char] -> Int
-luhnHex = error "TODO: define luhnHex"
+luhnHex = luhnModN 16 digitToInt
 
 -----------------------------------
 --
@@ -62,10 +72,17 @@ luhnHex = error "TODO: define luhnHex"
 -- >>> map digitToInt ['a'..'f']
 -- [10,11,12,13,14,15]
 -- >>> map digitToInt ['A'..'F']
--- [10,11,12,13,14,15]
+-- [-22,-21,-20,-19,-18,-17]
 
 digitToInt :: Char -> Int
-digitToInt = error "TODO: define digitToInt"
+digitToInt c
+    | isDigit c                            = ord c - ord '0'
+    | toLower c >= 'a' && toLower c <= 'f' = ord (toLower c) - ord 'a' + 10
+    | otherwise                            = error "Invalid character"
+
+isDigit :: Char -> Bool
+isDigit c | c >= '0' && c <= '9' = True
+          | otherwise            = False
 
 -----------------------------------
 --
@@ -82,7 +99,7 @@ digitToInt = error "TODO: define digitToInt"
 -- False
 
 validateDec :: Integer -> Bool
-validateDec = error "TODO: define validateDec"
+validateDec a = luhnDec (toDigits a) == (fromIntegral a `mod` 10)
 
 -----------------------------------
 --
@@ -98,5 +115,13 @@ validateDec = error "TODO: define validateDec"
 -- >>> validateHex "123abc0"
 -- False
 
+
 validateHex :: [Char] -> Bool
-validateHex = error "TODO: define validateHex"
+validateHex xs = luhnHex xs == digitToInt (last xs)
+
+head :: [a] -> a
+head (x:_) = x
+head []    = error "head: empty list"
+
+last :: [a] -> a
+last xs = head (reverse xs) 
